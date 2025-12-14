@@ -88,4 +88,22 @@ Fix: Ensure enemy grid cells receive the same hit/miss/sunk state classes as bef
 - sunk = darker red
 while keeping enemy ships hidden until sunk/revealed
 
+Bug: Outer Space theme ship tray shows original (default) ship visuals; space visuals only appear after placement
+Cause: Theme-specific ship styling/rendering is applied only to placed ships (grid cells) and not to tray items (or tray items are missing the theme/type classes used for space visuals)
+Fix: Ensure tray ship elements get the same theme/type classes (or SVG renderer) as placed ships when theme === 'space', so the tray renders the correct space ship visuals immediately
+
+Bug: Ship tray visuals overlap the ship names (labels) across all themes, making the names unreadable
+Cause: Tray item layout/CSS positioning changed (e.g., absolute positioning, missing flex alignment, or z-index), causing the ship graphic layer to sit on top of the label text
+Fix: Rework tray item layout so the label and ship visual do not overlap:
+- Use a stable flex/column layout (label above or beside the ship)
+- Remove absolute positioning that causes overlap
+- Ensure label has sufficient padding/space and higher z-index if needed
+
+Bug: Pirate theme ship tray shows duplicate ship visuals per type; only one rotates
+Cause: Pirate tray rendering is creating two visual elements for the same ship (duplicate SVG/overlay), but rotation is only applied to one of them
+Fix: Remove the extra/duplicate non-rotating visual from each Pirate tray item so there is only one ship visual per type, and the remaining visual is the one that rotates/drags correctly
+
+Bug: Placement status messages use default ship names (e.g., “Carrier placed!”) in Pirate and Outer Space themes instead of the themed names (e.g., “Galleon placed!”)
+Cause: The placement/status text is generated from the default ship name constants (Carrier/Battleship/etc.) instead of using the theme-specific displayName mapping used elsewhere for Pirate/Outer Space
+Fix: Updated the placement/status message generator to use the theme-aware ship display names for Pirate and Outer Space themes (while keeping Original unchanged), so all placement prompts and remaining-ship counts reference the correct themed names
 

@@ -303,6 +303,7 @@
     <!-- Difficulty Selection Modal -->
     <div id="difficulty-modal" class="difficulty-modal" style="display: none;">
         <div class="difficulty-content">
+            <button id="close-difficulty-btn" class="close-modal-btn">&times;</button>
             <h2>Select Difficulty</h2>
             <p class="difficulty-description">Choose your challenge level:</p>
             <div class="difficulty-buttons">
@@ -384,8 +385,14 @@
             
             <div class="instructions-section">
                 <h3>🎮 Getting Started</h3>
+                <p><strong>Theme Selection:</strong> Choose your visual theme from the dropdown on the home screen:</p>
+                <ul class="difficulty-list">
+                    <li><strong>Original:</strong> Classic naval battleship theme with traditional ship names</li>
+                    <li><strong>Pirate:</strong> High seas adventure with pirate ship names (Galleon, Frigate, Brigantine, Ketch, Sloop)</li>
+                    <li><strong>Outer Space:</strong> Sci-fi theme with space ship names (Star Carrier, Battlecruiser, Interceptor, Stealth Frigate, Scout Skiff)</li>
+                </ul>
                 <p><strong>Play Now:</strong> Click this button on the home screen to begin.</p>
-                <p><strong>Difficulty Selection:</strong> Choose your challenge level:</p>
+                <p><strong>Difficulty Selection:</strong> Choose your challenge level (you can close this modal with the X button to return to home):</p>
                 <ul class="difficulty-list">
                     <li><strong>Easy:</strong> AI fires randomly with no strategy</li>
                     <li><strong>Medium:</strong> AI uses hunt/target strategy with checkerboard pattern and finishes ships it finds</li>
@@ -402,7 +409,7 @@
                 <p><strong>Reset Button:</strong> Removes all placed ships so you can start over.</p>
                 <p><strong>Valid Placement:</strong> Ships turn <span class="valid-color">green</span> when placement is valid, <span class="invalid-color">red</span> when invalid.</p>
                 <p><strong>Ready to Play:</strong> Once all 5 ships are placed, a confirmation modal appears. Click <strong>Start Game</strong> to begin or <strong>Keep Editing</strong> to adjust placement.</p>
-                <p class="ship-sizes"><strong>Ships:</strong> Carrier (5 cells), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2)</p>
+                <p class="ship-sizes"><strong>Ships:</strong> 5 ships of varying sizes (5, 4, 3, 3, 2 cells). Ship names change based on your selected theme!</p>
             </div>
             
             <div class="instructions-section">
@@ -430,6 +437,8 @@
                     <li><strong>X Button:</strong> Return to home screen and reset the game</li>
                     <li><strong>R Key:</strong> Rotate ships during placement phase</li>
                     <li><strong>How to Play:</strong> Opens this help modal</li>
+                    <li><strong>Music Toggle:</strong> Turn background music on/off (button in top-right corner)</li>
+                    <li><strong>Theme Selector:</strong> Change visual theme at any time from the home screen</li>
                 </ul>
             </div>
             

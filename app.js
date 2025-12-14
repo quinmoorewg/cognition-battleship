@@ -31,8 +31,9 @@ function applyTheme(theme) {
         themeLabel.textContent = themeNames[theme] || 'Original';
     }
     
-    // Update ship names in placement tray
+    // Update ship names and visuals in placement tray
     updatePlacementTrayShipNames();
+    updateTrayShipVisuals();
 }
 
 // Update ship names in placement tray based on current theme
@@ -45,6 +46,43 @@ function updatePlacementTrayShipNames() {
         const nameSpan = trayShip.querySelector('.ship-name');
         if (nameSpan) {
             nameSpan.textContent = getShipDisplayName(shipName);
+        }
+    });
+}
+
+// Update ship visuals in placement tray based on current theme
+function updateTrayShipVisuals() {
+    const trayShips = document.querySelectorAll('.tray-ship');
+    if (trayShips.length === 0) return; // DOM not ready yet
+    
+    trayShips.forEach(trayShip => {
+        const shipName = trayShip.dataset.ship;
+        const shipSize = parseInt(trayShip.dataset.size);
+        
+        // Remove ALL existing ship-visual elements (there may be multiple from HTML)
+        const existingVisuals = trayShip.querySelectorAll('.ship-visual');
+        const wasVertical = Array.from(existingVisuals).some(v => v.classList.contains('vertical'));
+        existingVisuals.forEach(visual => visual.remove());
+        
+        // Generate theme-specific SVG (always horizontal in tray, isForTray=true)
+        const svgHTML = getShipSVG(shipName, shipSize, true, true);
+        
+        // Create the new SVG element
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = svgHTML;
+        const newSVG = tempDiv.querySelector('svg');
+        
+        if (newSVG) {
+            // Add ship-visual class
+            newSVG.classList.add('ship-visual');
+            
+            // Preserve vertical orientation if it was set
+            if (wasVertical) {
+                newSVG.classList.add('vertical');
+            }
+            
+            // Append the new SVG to the tray ship
+            trayShip.appendChild(newSVG);
         }
     });
 }
@@ -136,11 +174,22 @@ const PIRATE_SHIP_NAMES = {
     'Destroyer': 'Sloop'
 };
 
+const SPACE_SHIP_NAMES = {
+    'Carrier': 'Star Carrier',
+    'Battleship': 'Battlecruiser',
+    'Cruiser': 'Interceptor',
+    'Submarine': 'Stealth Frigate',
+    'Destroyer': 'Scout Skiff'
+};
+
 // Get display name based on current theme
 function getShipDisplayName(shipName) {
     const currentTheme = document.body.className.match(/theme-(\w+)/)?.[1] || 'original';
     if (currentTheme === 'pirate' && PIRATE_SHIP_NAMES[shipName]) {
         return PIRATE_SHIP_NAMES[shipName];
+    }
+    if (currentTheme === 'space' && SPACE_SHIP_NAMES[shipName]) {
+        return SPACE_SHIP_NAMES[shipName];
     }
     return shipName;
 }
@@ -343,18 +392,195 @@ let draggedShip = null;
 let previewCells = [];
 let previewShipOverlay = null;
 
-function getShipSVG(shipName, size, horizontal) {
+function getShipSVG(shipName, size, horizontal, isForTray = false) {
     const cellSize = 40;
     const width = horizontal ? size * (cellSize + 2) - 2 : cellSize;
     const height = horizontal ? cellSize : size * (cellSize + 2) - 2;
     
-    // Check if we're in Pirate theme
+    // Check current theme
     const currentTheme = document.body.className.match(/theme-(\w+)/)?.[1] || 'original';
     const isPirateTheme = currentTheme === 'pirate';
+    const isSpaceTheme = currentTheme === 'space';
     
     let svgContent = '';
     
-    if (isPirateTheme) {
+    if (isSpaceTheme) {
+        // Space-themed ship visuals matching home screen spacecraft style
+        if (shipName === 'Carrier') {
+            // Star Carrier - large capital ship (5 cells)
+            if (horizontal) {
+                svgContent = `
+                    <ellipse cx="${width/2}" cy="20" rx="${width/2-4}" ry="8" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="14" rx="${width/4}" ry="6" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="13" rx="${width/5}" ry="4" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="${width/2-15}" cy="13" rx="2" ry="1.5" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="${width/2}" cy="13" rx="2" ry="1.5" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="${width/2+15}" cy="13" rx="2" ry="1.5" fill="#667eea" opacity="0.8"/>
+                    <rect x="${cellSize*0.5}" y="21" width="8" height="5" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${cellSize*0.5+4}" cy="24" rx="3" ry="2" fill="#667eea" opacity="0.6"/>
+                    <rect x="${width-cellSize*0.5-8}" y="21" width="8" height="5" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${width-cellSize*0.5-4}" cy="24" rx="3" ry="2" fill="#667eea" opacity="0.6"/>
+                    <line x1="${cellSize*1}" y1="20" x2="${cellSize*4}" y2="20" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="${cellSize*1.5}" cy="18" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="${cellSize*2.5}" cy="18" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="${cellSize*3.5}" cy="18" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M ${width-4},20 Q ${width},20 ${width+1},22 Q ${width},24 ${width-4},24 Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            } else {
+                svgContent = `
+                    <ellipse cx="20" cy="${height/2}" rx="8" ry="${height/2-4}" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="14" cy="${height/2}" rx="6" ry="${height/4}" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="13" cy="${height/2}" rx="4" ry="${height/5}" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="13" cy="${height/2-15}" rx="1.5" ry="2" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="13" cy="${height/2}" rx="1.5" ry="2" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="13" cy="${height/2+15}" rx="1.5" ry="2" fill="#667eea" opacity="0.8"/>
+                    <rect x="21" y="${cellSize*0.5}" width="5" height="8" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="24" cy="${cellSize*0.5+4}" rx="2" ry="3" fill="#667eea" opacity="0.6"/>
+                    <rect x="21" y="${height-cellSize*0.5-8}" width="5" height="8" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="24" cy="${height-cellSize*0.5-4}" rx="2" ry="3" fill="#667eea" opacity="0.6"/>
+                    <line x1="20" y1="${cellSize*1}" x2="20" y2="${cellSize*4}" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="18" cy="${cellSize*1.5}" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="18" cy="${cellSize*2.5}" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="18" cy="${cellSize*3.5}" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M 20,${height-4} Q 20,${height} 22,${height+1} Q 24,${height} 24,${height-4} Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            }
+        } else if (shipName === 'Battleship') {
+            // Battlecruiser - heavy combat ship (4 cells)
+            if (horizontal) {
+                svgContent = `
+                    <ellipse cx="${width/2}" cy="20" rx="${width/2-4}" ry="7" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="15" rx="${width/4}" ry="5" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="14" rx="${width/5}" ry="3.5" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="${width/2-10}" cy="14" rx="1.5" ry="1" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="${width/2+10}" cy="14" rx="1.5" ry="1" fill="#667eea" opacity="0.8"/>
+                    <rect x="${cellSize*0.6}" y="21" width="7" height="4" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${cellSize*0.6+3.5}" cy="23.5" rx="2.5" ry="1.5" fill="#667eea" opacity="0.6"/>
+                    <rect x="${width-cellSize*0.6-7}" y="21" width="7" height="4" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${width-cellSize*0.6-3.5}" cy="23.5" rx="2.5" ry="1.5" fill="#667eea" opacity="0.6"/>
+                    <line x1="${cellSize*1}" y1="20" x2="${cellSize*3}" y2="20" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="${cellSize*1.5}" cy="18" r="0.7" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="${cellSize*2.5}" cy="18" r="0.7" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M ${width-4},20 Q ${width},20 ${width+1},22 Q ${width},24 ${width-4},24 Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            } else {
+                svgContent = `
+                    <ellipse cx="20" cy="${height/2}" rx="7" ry="${height/2-4}" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="15" cy="${height/2}" rx="5" ry="${height/4}" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="14" cy="${height/2}" rx="3.5" ry="${height/5}" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="14" cy="${height/2-10}" rx="1" ry="1.5" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="14" cy="${height/2+10}" rx="1" ry="1.5" fill="#667eea" opacity="0.8"/>
+                    <rect x="21" y="${cellSize*0.6}" width="4" height="7" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="23.5" cy="${cellSize*0.6+3.5}" rx="1.5" ry="2.5" fill="#667eea" opacity="0.6"/>
+                    <rect x="21" y="${height-cellSize*0.6-7}" width="4" height="7" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="23.5" cy="${height-cellSize*0.6-3.5}" rx="1.5" ry="2.5" fill="#667eea" opacity="0.6"/>
+                    <line x1="20" y1="${cellSize*1}" x2="20" y2="${cellSize*3}" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="18" cy="${cellSize*1.5}" r="0.7" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="18" cy="${cellSize*2.5}" r="0.7" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M 20,${height-4} Q 20,${height} 22,${height+1} Q 24,${height} 24,${height-4} Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            }
+        } else if (shipName === 'Cruiser') {
+            // Interceptor - sleek fighter (3 cells)
+            if (horizontal) {
+                svgContent = `
+                    <ellipse cx="${width/2}" cy="20" rx="${width/2-3}" ry="6" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="16" rx="${width/4}" ry="4" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="15" rx="${width/5}" ry="3" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="${width/2-8}" cy="15" rx="1.2" ry="0.8" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="${width/2+8}" cy="15" rx="1.2" ry="0.8" fill="#667eea" opacity="0.8"/>
+                    <path d="M ${cellSize*0.3},20 Q ${cellSize*0.2},18 ${cellSize*0.1},20 L ${cellSize*0.2},23 Q ${cellSize*0.25},21 ${cellSize*0.3},23 Z" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <path d="M ${width-cellSize*0.3},20 Q ${width-cellSize*0.2},18 ${width-cellSize*0.1},20 L ${width-cellSize*0.2},23 Q ${width-cellSize*0.25},21 ${width-cellSize*0.3},23 Z" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <rect x="${cellSize*0.7}" y="21" width="6" height="3" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${cellSize*0.7+3}" cy="23" rx="2" ry="1" fill="#667eea" opacity="0.6"/>
+                    <rect x="${width-cellSize*0.7-6}" y="21" width="6" height="3" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${width-cellSize*0.7-3}" cy="23" rx="2" ry="1" fill="#667eea" opacity="0.6"/>
+                    <line x1="${cellSize*0.8}" y1="20" x2="${cellSize*2.2}" y2="20" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="${cellSize*1.5}" cy="18" r="0.6" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M ${width-3},20 Q ${width},20 ${width+1},22 Q ${width},24 ${width-3},24 Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            } else {
+                svgContent = `
+                    <ellipse cx="20" cy="${height/2}" rx="6" ry="${height/2-3}" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="16" cy="${height/2}" rx="4" ry="${height/4}" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="15" cy="${height/2}" rx="3" ry="${height/5}" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="15" cy="${height/2-8}" rx="0.8" ry="1.2" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="15" cy="${height/2+8}" rx="0.8" ry="1.2" fill="#667eea" opacity="0.8"/>
+                    <path d="M 20,${cellSize*0.3} Q 18,${cellSize*0.2} 20,${cellSize*0.1} L 23,${cellSize*0.2} Q 21,${cellSize*0.25} 23,${cellSize*0.3} Z" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <path d="M 20,${height-cellSize*0.3} Q 18,${height-cellSize*0.2} 20,${height-cellSize*0.1} L 23,${height-cellSize*0.2} Q 21,${height-cellSize*0.25} 23,${height-cellSize*0.3} Z" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <rect x="21" y="${cellSize*0.7}" width="3" height="6" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="23" cy="${cellSize*0.7+3}" rx="1" ry="2" fill="#667eea" opacity="0.6"/>
+                    <rect x="21" y="${height-cellSize*0.7-6}" width="3" height="6" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="23" cy="${height-cellSize*0.7-3}" rx="1" ry="2" fill="#667eea" opacity="0.6"/>
+                    <line x1="20" y1="${cellSize*0.8}" x2="20" y2="${cellSize*2.2}" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="18" cy="${cellSize*1.5}" r="0.6" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M 20,${height-3} Q 20,${height} 22,${height+1} Q 24,${height} 24,${height-3} Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            }
+        } else if (shipName === 'Submarine') {
+            // Stealth Frigate - stealthy design (3 cells)
+            if (horizontal) {
+                svgContent = `
+                    <ellipse cx="${width/2}" cy="20" rx="${width/2-3}" ry="6" fill="#2d3748" stroke="#1a202c" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="16" rx="${width/4}" ry="4" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="15" rx="${width/5}" ry="3" fill="#5a67d8" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="${width/2-8}" cy="15" rx="1.2" ry="0.8" fill="#667eea" opacity="0.7"/>
+                    <ellipse cx="${width/2+8}" cy="15" rx="1.2" ry="0.8" fill="#667eea" opacity="0.7"/>
+                    <rect x="${cellSize*0.7}" y="21" width="6" height="3" rx="1" fill="#2d3748" stroke="#1a202c" stroke-width="0.5"/>
+                    <ellipse cx="${cellSize*0.7+3}" cy="23" rx="2" ry="1" fill="#667eea" opacity="0.5"/>
+                    <rect x="${width-cellSize*0.7-6}" y="21" width="6" height="3" rx="1" fill="#2d3748" stroke="#1a202c" stroke-width="0.5"/>
+                    <ellipse cx="${width-cellSize*0.7-3}" cy="23" rx="2" ry="1" fill="#667eea" opacity="0.5"/>
+                    <line x1="${cellSize*0.8}" y1="20" x2="${cellSize*2.2}" y2="20" stroke="#4a5568" stroke-width="0.5" opacity="0.4"/>
+                    <circle cx="${cellSize*1.5}" cy="18" r="0.6" fill="#a78bfa" opacity="0.7"/>
+                    <path d="M ${width-3},20 Q ${width},20 ${width+1},22 Q ${width},24 ${width-3},24 Z" fill="#667eea" opacity="0.7" stroke="#1a202c" stroke-width="0.5"/>
+                `;
+            } else {
+                svgContent = `
+                    <ellipse cx="20" cy="${height/2}" rx="6" ry="${height/2-3}" fill="#2d3748" stroke="#1a202c" stroke-width="1"/>
+                    <ellipse cx="16" cy="${height/2}" rx="4" ry="${height/4}" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="15" cy="${height/2}" rx="3" ry="${height/5}" fill="#5a67d8" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="15" cy="${height/2-8}" rx="0.8" ry="1.2" fill="#667eea" opacity="0.7"/>
+                    <ellipse cx="15" cy="${height/2+8}" rx="0.8" ry="1.2" fill="#667eea" opacity="0.7"/>
+                    <rect x="21" y="${cellSize*0.7}" width="3" height="6" rx="1" fill="#2d3748" stroke="#1a202c" stroke-width="0.5"/>
+                    <ellipse cx="23" cy="${cellSize*0.7+3}" rx="1" ry="2" fill="#667eea" opacity="0.5"/>
+                    <rect x="21" y="${height-cellSize*0.7-6}" width="3" height="6" rx="1" fill="#2d3748" stroke="#1a202c" stroke-width="0.5"/>
+                    <ellipse cx="23" cy="${height-cellSize*0.7-3}" rx="1" ry="2" fill="#667eea" opacity="0.5"/>
+                    <line x1="20" y1="${cellSize*0.8}" x2="20" y2="${cellSize*2.2}" stroke="#4a5568" stroke-width="0.5" opacity="0.4"/>
+                    <circle cx="18" cy="${cellSize*1.5}" r="0.6" fill="#a78bfa" opacity="0.7"/>
+                    <path d="M 20,${height-3} Q 20,${height} 22,${height+1} Q 24,${height} 24,${height-3} Z" fill="#667eea" opacity="0.7" stroke="#1a202c" stroke-width="0.5"/>
+                `;
+            }
+        } else if (shipName === 'Destroyer') {
+            // Scout Skiff - small nimble craft (2 cells)
+            if (horizontal) {
+                svgContent = `
+                    <ellipse cx="${width/2}" cy="20" rx="${width/2-2}" ry="5" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="17" rx="${width/4}" ry="3.5" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="${width/2}" cy="16" rx="${width/5}" ry="2.5" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="${width/2-5}" cy="16" rx="1" ry="0.7" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="${width/2+5}" cy="16" rx="1" ry="0.7" fill="#667eea" opacity="0.8"/>
+                    <rect x="${cellSize*0.8}" y="21" width="5" height="3" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="${cellSize*0.8+2.5}" cy="23" rx="1.5" ry="1" fill="#667eea" opacity="0.6"/>
+                    <line x1="${cellSize*0.5}" y1="20" x2="${cellSize*1.5}" y2="20" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="${cellSize*1}" cy="18" r="0.5" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M ${width-3},20 Q ${width},20 ${width+1},22 Q ${width},24 ${width-3},24 Z" fill="#667eea" opacity="0.8" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            } else {
+                svgContent = `
+                    <ellipse cx="20" cy="${height/2}" rx="5" ry="${height/2-2}" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="17" cy="${height/2}" rx="3.5" ry="${height/4}" fill="#5a67d8" stroke="#2d3748" stroke-width="1"/>
+                    <ellipse cx="16" cy="${height/2}" rx="2.5" ry="${height/5}" fill="#667eea" opacity="0.6" stroke="#4a5568" stroke-width="0.5"/>
+                    <ellipse cx="16" cy="${height/2-5}" rx="0.7" ry="1" fill="#667eea" opacity="0.8"/>
+                    <ellipse cx="16" cy="${height/2+5}" rx="0.7" ry="1" fill="#667eea" opacity="0.8"/>
+                    <rect x="21" y="${cellSize*0.8}" width="3" height="5" rx="1" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+                    <ellipse cx="23" cy="${cellSize*0.8+2.5}" rx="1" ry="1.5" fill="#667eea" opacity="0.6"/>
+                    <line x1="20" y1="${cellSize*0.5}" x2="20" y2="${cellSize*1.5}" stroke="#4a5568" stroke-width="0.5" opacity="0.5"/>
+                    <circle cx="18" cy="${cellSize*1}" r="0.5" fill="#a78bfa" opacity="0.8"/>
+                    <path d="M 20,${height-3} Q 20,${height} 22,${height+1} Q 24,${height} 24,${height-3} Z" fill="#667eea" opacity="0.7" stroke="#2d3748" stroke-width="0.5"/>
+                `;
+            }
+        }
+    } else if (isPirateTheme) {
         // Pirate-themed ship visuals
         if (shipName === 'Carrier') {
             // Galleon - 3 masts
@@ -567,7 +793,9 @@ function getShipSVG(shipName, size, horizontal) {
         }
     }
     
-    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="position: absolute; pointer-events: none;">${svgContent}</svg>`;
+    // Only use absolute positioning for grid ships, not tray ships
+    const positionStyle = isForTray ? '' : 'position: absolute; ';
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="${positionStyle}pointer-events: none;">${svgContent}</svg>`;
 }
 
 function setupShipTrayDrag() {
@@ -627,7 +855,7 @@ function attachGridDropListeners() {
                 draggedShip.element.draggable = false;
                 gameState.placedShips.add(draggedShip.name);
 
-                updateStatus(`${draggedShip.name} placed! ${5 - gameState.placedShips.size} ships remaining. Click placed ships to move them.`);
+                updateStatus(`${getShipDisplayName(draggedShip.name)} placed! ${5 - gameState.placedShips.size} ships remaining. Click placed ships to move them.`);
                 
                 // Re-attach listeners after placing (already done in placePlayerShip)
 
@@ -639,7 +867,7 @@ function attachGridDropListeners() {
                     }, 500);
                 }
             } else {
-                updateStatus(`Invalid placement for ${draggedShip.name}! Try another location.`);
+                updateStatus(`Invalid placement for ${getShipDisplayName(draggedShip.name)}! Try another location.`);
             }
 
             clearPreview();
@@ -786,7 +1014,7 @@ function removeShip(ship) {
     attachPlacedShipClickListeners();
     
     // Update status
-    updateStatus(`${ship.name} removed. ${5 - gameState.placedShips.size} ships remaining to place.`);
+    updateStatus(`${getShipDisplayName(ship.name)} removed. ${5 - gameState.placedShips.size} ships remaining to place.`);
     
     // Hide confirmation modal if it was showing
     placementConfirmationModal.style.display = 'none';
@@ -2021,6 +2249,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const instructionsModal = document.getElementById('instructions-modal');
     const closeInstructionsBtn = document.getElementById('close-instructions-btn');
     const difficultyModal = document.getElementById('difficulty-modal');
+    const closeDifficultyBtn = document.getElementById('close-difficulty-btn');
     const easyModeBtn = document.getElementById('easy-mode-btn');
     const mediumModeBtn = document.getElementById('medium-mode-btn');
     const hardModeBtn = document.getElementById('hard-mode-btn');
@@ -2049,6 +2278,13 @@ window.addEventListener('DOMContentLoaded', () => {
     if (closeInstructionsBtn) {
         closeInstructionsBtn.addEventListener('click', () => {
             instructionsModal.style.display = 'none';
+        });
+    }
+    
+    // Close difficulty modal (X button)
+    if (closeDifficultyBtn) {
+        closeDifficultyBtn.addEventListener('click', () => {
+            difficultyModal.style.display = 'none';
         });
     }
     

@@ -80,6 +80,21 @@ body.theme-original .ocean-wave {
     display: block;
 }
 
+/* Add floating animation to battleship */
+body.theme-original .ship-svg {
+    animation: shipBob 6s ease-in-out infinite;
+}
+
+/* Gentle bobbing animation for ships */
+@keyframes shipBob {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
 /* Keep original decorative elements */
 body.theme-original .decorative-missiles .missile {
     display: inline;
@@ -164,6 +179,7 @@ body.theme-space .ship-svg {
 
 body.theme-space .spaceship-svg {
     display: block;
+    animation: shipBob 6s ease-in-out infinite;
 }
 
 /* Hide spaceship in other themes */
@@ -189,18 +205,8 @@ body.theme-space .engine-glow-right {
     }
 }
 
-/* Space-themed ship colors in placement tray */
-body.theme-space .tray-ship .ship-visual rect,
-body.theme-space .tray-ship .ship-visual path,
-body.theme-space .tray-ship .ship-visual polygon {
-    fill: #4a5568;
-    stroke: #2d3748;
-}
-
-body.theme-space .tray-ship .ship-visual ellipse {
-    fill: #5a67d8;
-    stroke: #4c51bf;
-}
+/* Space-themed ship colors in placement tray - removed overrides to match placed ships */
+/* Tray ships now use the same SVG colors as placed ships (grey body + purple accents) */
 
 /* Space theme ship emoji decoration only - do not change cell colors */
 body.theme-space .cell.ship::after {
@@ -212,12 +218,26 @@ body.theme-space .cell.ship::after {
    PIRATE THEME
    ======================================== */
 body.theme-pirate {
-    background: linear-gradient(to bottom, #2c3e50 0%, #1a252f 50%, #0d1117 100%);
+    /* Pirate ocean gradient - continuous from sky to deep ocean */
+    background: linear-gradient(to bottom, 
+        #5a6c7d 0%,      /* Stormy sky */
+        #3d4f5e 35%,     /* Lower sky */
+        #2c3e50 48%,     /* Horizon */
+        #1e2d3d 50%,     /* Upper ocean */
+        #16202d 52%,     /* Ocean surface */
+        #0f1821 70%,     /* Deep ocean */
+        #0a1118 100%     /* Ocean depths */
+    );
 }
 
 body.theme-pirate .home-screen {
     background: transparent;
     position: relative;
+}
+
+/* Disable subsurface gradients for uniform ocean color */
+body.theme-pirate .home-screen::after {
+    display: none;
 }
 
 /* Pirate theme heading colors - match home page */
@@ -230,10 +250,17 @@ body.theme-pirate h2 {
 }
 
 
-/* Darker ocean for pirate theme */
-body.theme-pirate .ocean-wave path {
-    fill: #0d1117;
-    stroke: rgba(139, 69, 19, 0.6);
+/* Darker ocean for pirate theme - match gradient color at waterline */
+body.theme-pirate .ocean-wave path[fill]:not([fill="none"]) {
+    fill: #16202d !important;
+    opacity: 0.95;
+}
+
+/* Keep white outline on stroke-only paths */
+body.theme-pirate .ocean-wave path[fill="none"] {
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 2;
+    fill: none;
 }
 
 

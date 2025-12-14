@@ -1314,15 +1314,15 @@ h1 {
     display: block;
     margin: 30px auto 0;
     padding: 15px 50px;
-    font-size: 1.2em;
-    font-weight: bold;
-    background: #e74c3c;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     color: white;
     border: none;
-    border-radius: 50px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -1335,6 +1335,36 @@ h1 {
 
 .close-instructions-btn:active {
     transform: translateY(-1px);
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #7f8c8d;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    line-height: 1;
+    padding: 0;
+}
+
+.close-modal-btn:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    transform: rotate(90deg);
+}
+
+.close-modal-btn:active {
+    transform: rotate(90deg) scale(0.95);
 }
 
 @media (max-width: 768px) {
