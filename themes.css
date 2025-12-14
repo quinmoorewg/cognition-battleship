@@ -1,0 +1,350 @@
+/* ========================================
+   THEME SYSTEM - Original, Outer Space, Pirate
+   ======================================== */
+
+/* Home screen top-right controls container */
+.home-top-right-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1000;
+    align-items: flex-end;
+    pointer-events: auto;
+}
+
+/* Theme selector styling */
+.theme-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.theme-selector label {
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+}
+
+.theme-dropdown {
+    padding: 8px 12px;
+    font-size: 1em;
+    font-family: 'Anton', sans-serif;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theme-dropdown:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.theme-label {
+    font-size: 2em;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 10px 0 0 0;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* ========================================
+   ORIGINAL THEME (Default Naval)
+   ======================================== */
+body.theme-original {
+    background: linear-gradient(to bottom, #87CEEB 0%, #5DADE2 35%, #3498DB 48%, #2E86AB 50%, #1A5276 52%, #154360 70%, #0B2F47 100%);
+}
+
+body.theme-original .home-screen {
+    background: transparent;
+}
+
+/* Original theme heading colors - match home page */
+body.theme-original h1,
+body.theme-original h2 {
+    color: #ffffff !important;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7),
+                 -1px -1px 4px rgba(135, 206, 235, 0.5),
+                 0 0 25px rgba(93, 173, 226, 0.4);
+}
+
+/* Keep original ocean wave visible */
+body.theme-original .ocean-wave {
+    display: block;
+}
+
+/* Keep original decorative elements */
+body.theme-original .decorative-missiles .missile {
+    display: inline;
+}
+
+body.theme-original .decorative-explosions .explosion {
+    display: inline;
+}
+
+/* ========================================
+   OUTER SPACE THEME
+   ======================================== */
+body.theme-space {
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 50%, #0f0f1e 100%);
+}
+
+body.theme-space .home-screen {
+    background: transparent;
+    position: relative;
+}
+
+/* Outer Space theme heading colors - match home page */
+body.theme-space h1,
+body.theme-space h2 {
+    color: #ffffff !important;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7),
+                 -1px -1px 4px rgba(135, 206, 235, 0.5),
+                 0 0 25px rgba(93, 173, 226, 0.4);
+}
+
+/* Add starfield effect */
+body.theme-space .home-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, white, transparent),
+        radial-gradient(2px 2px at 60% 70%, white, transparent),
+        radial-gradient(1px 1px at 50% 50%, white, transparent),
+        radial-gradient(1px 1px at 80% 10%, white, transparent),
+        radial-gradient(2px 2px at 90% 60%, white, transparent),
+        radial-gradient(1px 1px at 33% 80%, white, transparent),
+        radial-gradient(1px 1px at 15% 60%, white, transparent);
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+    opacity: 0.8;
+    animation: starTwinkle 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes starTwinkle {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+}
+
+/* Add nebula effect */
+body.theme-space .home-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 30% 40%, rgba(138, 43, 226, 0.15), transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(0, 191, 255, 0.1), transparent 50%);
+    pointer-events: none;
+}
+
+/* Hide ocean wave in space theme */
+body.theme-space .ocean-wave {
+    display: none;
+}
+
+
+/* Space ship visuals for home screen */
+body.theme-space .ship-svg {
+    display: none;
+}
+
+body.theme-space .spaceship-svg {
+    display: block;
+}
+
+/* Hide spaceship in other themes */
+body.theme-original .spaceship-svg,
+body.theme-pirate .spaceship-svg {
+    display: none;
+}
+
+/* Spaceship engine glow animation */
+body.theme-space .engine-glow-left,
+body.theme-space .engine-glow-right {
+    animation: enginePulse 2s ease-in-out infinite;
+}
+
+@keyframes enginePulse {
+    0%, 100% {
+        opacity: 0.6;
+        filter: blur(2px);
+    }
+    50% {
+        opacity: 0.9;
+        filter: blur(4px);
+    }
+}
+
+/* Space-themed ship colors in placement tray */
+body.theme-space .tray-ship .ship-visual rect,
+body.theme-space .tray-ship .ship-visual path,
+body.theme-space .tray-ship .ship-visual polygon {
+    fill: #4a5568;
+    stroke: #2d3748;
+}
+
+body.theme-space .tray-ship .ship-visual ellipse {
+    fill: #5a67d8;
+    stroke: #4c51bf;
+}
+
+/* Space theme ship emoji decoration only - do not change cell colors */
+body.theme-space .cell.ship::after {
+    content: '';
+    font-size: 0.6em;
+}
+
+/* ========================================
+   PIRATE THEME
+   ======================================== */
+body.theme-pirate {
+    background: linear-gradient(to bottom, #2c3e50 0%, #1a252f 50%, #0d1117 100%);
+}
+
+body.theme-pirate .home-screen {
+    background: transparent;
+    position: relative;
+}
+
+/* Pirate theme heading colors - match home page */
+body.theme-pirate h1,
+body.theme-pirate h2 {
+    color: #ffffff !important;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7),
+                 -1px -1px 4px rgba(135, 206, 235, 0.5),
+                 0 0 25px rgba(93, 173, 226, 0.4);
+}
+
+
+/* Darker ocean for pirate theme */
+body.theme-pirate .ocean-wave path {
+    fill: #0d1117;
+    stroke: rgba(139, 69, 19, 0.6);
+}
+
+
+/* Pirate ship visuals for home screen */
+body.theme-pirate .ship-svg {
+    display: none;
+}
+
+body.theme-pirate .pirate-ship-svg {
+    display: block;
+    animation: pirateShipBob 6s ease-in-out infinite;
+}
+
+/* Hide pirate ship in other themes */
+body.theme-original .pirate-ship-svg,
+body.theme-space .pirate-ship-svg {
+    display: none;
+}
+
+/* Gentle bobbing animation for pirate ship */
+@keyframes pirateShipBob {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Subtle sail sway animation */
+body.theme-pirate .pirate-sail {
+    animation: pirateSailSway 5s ease-in-out infinite;
+    transform-origin: left center;
+}
+
+body.theme-pirate .pirate-sail:nth-of-type(1) {
+    animation-delay: 0s;
+}
+
+body.theme-pirate .pirate-sail:nth-of-type(2) {
+    animation-delay: 0.3s;
+}
+
+body.theme-pirate .pirate-sail:nth-of-type(3) {
+    animation-delay: 0.6s;
+}
+
+@keyframes pirateSailSway {
+    0%, 100% {
+        transform: scaleX(1);
+    }
+    50% {
+        transform: scaleX(1.02);
+    }
+}
+
+
+/* Show/hide ship visuals based on theme */
+.ship-visual-pirate {
+    display: none;
+}
+
+body.theme-pirate .ship-visual-default {
+    display: none;
+}
+
+body.theme-pirate .ship-visual-pirate {
+    display: block;
+}
+
+/* Pirate theme ship emoji decoration only - do not change cell colors */
+body.theme-pirate .cell.ship::after {
+    content: '';
+    font-size: 0.6em;
+}
+
+/* ========================================
+   THEME-SPECIFIC ADJUSTMENTS
+   ======================================== */
+
+/* Ensure theme label is visible in all themes */
+body.theme-space .theme-label {
+    color: #e0e0ff;
+    text-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+}
+
+body.theme-pirate .theme-label {
+    color: #d2691e;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Theme dropdown styling per theme */
+body.theme-space .theme-dropdown {
+    background: rgba(26, 26, 46, 0.8);
+    border-color: rgba(138, 43, 226, 0.5);
+}
+
+body.theme-pirate .theme-dropdown {
+    background: rgba(13, 17, 23, 0.8);
+    border-color: rgba(139, 69, 19, 0.5);
+}
+
+
+/* Ship reflection theming */
+body.theme-space .ship-reflection path,
+body.theme-space .ship-reflection rect {
+    fill: #4a5568;
+}
+
+body.theme-pirate .ship-reflection path,
+body.theme-pirate .ship-reflection rect {
+    fill: #8b4513;
+}
+
