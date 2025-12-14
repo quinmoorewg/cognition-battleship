@@ -1,6 +1,6 @@
 # Battleship Game
 
-A classic Battleship game built with vanilla HTML, CSS, and JavaScript. Battle against an AI opponent in this naval warfare strategy game! Features multiple themes, difficulty levels, and strategic gameplay.
+A classic Battleship game built with HTML, CSS, and JavaScript. Battle against an AI opponent in this naval warfare strategy game! Features multiple themes, difficulty levels, and strategic gameplay.
 
 ## Features
 
