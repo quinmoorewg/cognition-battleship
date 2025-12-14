@@ -123,7 +123,7 @@ A classic Battleship game built with HTML, CSS, and JavaScript. Battle against a
 
 ## Technical Details
 
-- **No frameworks or libraries**: Pure vanilla HTML, CSS, and JavaScript
+- **No frameworks or libraries**: Pure HTML, CSS, and JavaScript
 - **Responsive design**: Works on desktop and mobile devices
 - **Browser compatibility**: Works in all modern browsers (Chrome, Firefox, Safari, Edge)
 - **Local storage**: Theme preference persisted between sessions
